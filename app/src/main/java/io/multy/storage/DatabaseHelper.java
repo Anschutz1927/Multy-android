@@ -14,9 +14,11 @@ import io.multy.model.entities.Mnemonic;
 import io.multy.model.entities.RootKey;
 import io.multy.model.entities.Token;
 import io.multy.model.entities.UserId;
+import io.multy.model.entities.wallet.WalletAddress;
 import io.multy.model.entities.wallet.WalletRealmObject;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public class DatabaseHelper {
@@ -99,5 +101,38 @@ public class DatabaseHelper {
 
     public DeviceId getDeviceId() {
         return realm.where(DeviceId.class).findFirst();
+    }
+
+    public boolean removeWallet(WalletRealmObject walletRealmObject) {
+        try {
+            realm.beginTransaction();
+            RealmList<WalletAddress> adderesses = walletRealmObject.getAddresses();
+            //TODO:Remove all inner lists from wallet before remove wallet?;
+            if (adderesses != null && adderesses.size() > 0) {
+                adderesses.deleteAllFromRealm();
+            }
+            walletRealmObject.deleteFromRealm();
+            realm.commitTransaction();
+            return true;
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean saveWalletSettings(WalletRealmObject walletValue, String newName, String newCurrency) {
+        try {
+            realm.beginTransaction();
+            walletValue.setName(newName);
+            walletValue.setFiatCurrency(newCurrency);
+//            realm.copyToRealmOrUpdate(walletValue);
+            realm.commitTransaction();
+            return true;
+        }
+        catch (Throwable t) {
+            t.printStackTrace();
+            return false;
+        }
     }
 }

@@ -139,4 +139,11 @@ public class DataManager {
         database.setDeviceId(deviceId);
     }
 
+    public boolean removeWallet(WalletRealmObject walletRealmObject) {
+        return database.removeWallet(walletRealmObject);
+    }
+
+    public Boolean saveWalletSettings(WalletRealmObject walletValue, String newName, String newCurrency) {
+        return database.saveWalletSettings(walletValue, newName, newCurrency);
+    }
 }

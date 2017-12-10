@@ -18,8 +18,11 @@ import io.multy.model.entities.wallet.WalletAddress;
 import io.multy.model.entities.wallet.WalletRealmObject;
 import io.multy.model.responses.UserAssetsResponse;
 import io.multy.model.responses.WalletInfo;
+import io.reactivex.Observable;
+import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.RealmResults;
 import timber.log.Timber;
@@ -101,5 +104,35 @@ public class WalletViewModel extends BaseViewModel {
         return wallet;
     }
 
+    public void removeWalletLive(Consumer<Boolean> onNext, Consumer<Throwable> onError) {
+        if (dataManager == null) {
+            dataManager = new DataManager(Multy.getContext());
+        }
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) e -> {
+            e.onNext(dataManager.removeWallet(wallet.getValue()));
+            e.onComplete();
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(onNext, onError);
+        addDisposable(disposable);
+    }
 
+    public void showPrivateKey(Consumer<String> onNext, Consumer<Throwable> onError) {
+        //TODO: get real private key and put into onNext()
+        Disposable disposable = Observable.create((ObservableOnSubscribe<String>) e -> e.onNext("My private key"))
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(onNext, onError);
+        addDisposable(disposable);
+    }
+
+    public void saveWallet(String newName, Consumer<Boolean> onNext, Consumer<Throwable> onError) {
+        Disposable disposable = Observable.create((ObservableOnSubscribe<Boolean>) e -> {
+            e.onNext(dataManager.saveWalletSettings(wallet.getValue(), newName, fiatCurrency.getValue()));
+            e.onComplete();
+        }).subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(onNext, onError);
+        addDisposable(disposable);
+    }
 }

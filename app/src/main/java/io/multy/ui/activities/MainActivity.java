@@ -29,6 +29,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.branch.referral.Branch;
 import io.multy.R;
+import io.multy.ui.fragments.asset.AssetSettingsFragment;
 import io.multy.ui.fragments.dialogs.SimpleDialogFragment;
 import io.multy.ui.fragments.main.AssetsFragment;
 import io.multy.ui.fragments.main.ContactsFragment;
@@ -53,7 +54,8 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
         ButterKnife.bind(this);
         isFirstFragmentCreation = true;
         setupFooter();
-        setFragment(R.id.container_frame, AssetsFragment.newInstance());
+//        setFragment(R.id.container_frame, AssetsFragment.newInstance());
+        setFragment(R.id.container_frame, AssetSettingsFragment.newInstance());
 
 //        preventRootIfDetected();
 
