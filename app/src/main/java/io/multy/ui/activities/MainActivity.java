@@ -56,6 +56,29 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
         setFragment(R.id.container_frame, AssetsFragment.newInstance());
 
 //        preventRootIfDetected();
+
+//        MultyApi.INSTANCE.getWalletAddresses(0)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<UserAssetsResponse>() {
+//                    @Override
+//                    public void accept(UserAssetsResponse userAssetsResponse) throws Exception {
+//                        Log.i("wise", "accept");
+//                    }
+//                });
+
+//        Call<ResponseBody> responseBodyCall = MultyApi.INSTANCE.getSpendableOutputs(0);
+//        responseBodyCall.enqueue(new Callback<ResponseBody>() {
+//            @Override
+//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                Log.i("wise", "onResponse ");
+//            }
+//
+//            @Override
+//            public void onFailure(Call<ResponseBody> call, Throwable t) {
+//                t.printStackTrace();
+//            }
+//        });
     }
 
     private void preventRootIfDetected() {
@@ -66,14 +89,13 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
         }
     }
 
-    
     @Override
     protected void onResume() {
         super.onResume();
         initBranchIO();
     }
 
-    private void initBranchIO(){
+    private void initBranchIO() {
         Branch branch = Branch.getInstance(getApplicationContext());
 
         branch.initSession((referringParams, error) -> {
@@ -187,9 +209,9 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
             ImageView image = view.findViewById(R.id.image_logo);
             int filterColor;
             if (mustEnable) {
-                filterColor = ContextCompat.getColor(this, R.color.tab_active);
+                filterColor = ContextCompat.getColor(this, R.color.blue);
             } else {
-                filterColor = ContextCompat.getColor(this, R.color.tab_inactive);
+                filterColor = ContextCompat.getColor(this, R.color.blue_light);
             }
             title.setTextColor(filterColor);
             image.setColorFilter(filterColor, PorterDuff.Mode.SRC_IN);
@@ -216,5 +238,29 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
                 .replace(R.id.full_container, fastOperationsFragment, FastOperationsFragment.TAG)
                 .addToBackStack(FastOperationsFragment.TAG)
                 .commit();
+//        MultyApi.INSTANCE.getSpendableOutputs();
+//        MultyApi.INSTANCE.getUserAssets()
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .subscribe(new Consumer<UserAssetsResponse>() {
+//                    @Override
+//                    public void accept(UserAssetsResponse userAssetsResponse) throws Exception {
+//                        Log.i("wise", "response");
+//                    }
+//                });
+//        MultyApi.INSTANCE.getTransactionSpeed();
+//        try {
+////            Log.i("wise", "to " + (NativeDataHelper.makeAccountAddress(, 0, 0)));
+//
+//            byte[] seed = new DataManager(this).getSeed().getSeed();
+//            final String txHash = "6e26d2fb53983051172a2714838fab9c3241d5dcdb022926b834e254e7ae2034";
+//            final String pubKey = "76a9149543b205596749495eae1d6305434c2c8084b25a88ac";
+//            final String address = "mu8C5CGtmSn3eUhMFEmU2CvRse7rLKgYUN";
+//            byte[] hexTx = NativeDataHelper.makeTransaction(seed, txHash, pubKey, 0, "200000000","150000000", "1000000", "mzqiDnETWkunRDZxjUQ34JzN1LDevh5DpU", address);
+//            String hex = byteArrayToHex(hexTx);
+//            Log.i("multy", "raw transaction generated successfully " + hex);
+//        } catch (JniException e) {
+//            e.printStackTrace();
+//        }
     }
 }
