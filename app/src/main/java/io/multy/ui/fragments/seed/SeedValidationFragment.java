@@ -21,7 +21,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import com.samwolfand.oneprefs.Prefs;
@@ -39,7 +40,7 @@ import io.multy.viewmodels.SeedViewModel;
 public class SeedValidationFragment extends BaseSeedFragment {
 
     @BindView(R.id.input_word)
-    EditText inputWord;
+    AutoCompleteTextView inputWord;
 
     @BindView(R.id.button_next)
     TextView buttonNext;
@@ -121,6 +122,13 @@ public class SeedValidationFragment extends BaseSeedFragment {
                 }
             }
         });
+        String[] seedWords = getResources().getStringArray(R.array.seed_words);
+        ArrayAdapter<String> autocompleteAdapter = new ArrayAdapter<>(
+                getContext(),
+                R.layout.view_dropdown_item,
+                seedWords
+        );
+        inputWord.setAdapter(autocompleteAdapter);
     }
 
     private void refreshCounter() {
