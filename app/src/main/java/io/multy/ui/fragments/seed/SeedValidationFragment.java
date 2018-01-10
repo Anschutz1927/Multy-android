@@ -21,11 +21,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.TextView;
 
 import com.samwolfand.oneprefs.Prefs;
+
+import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -103,6 +104,7 @@ public class SeedValidationFragment extends BaseSeedFragment {
         buttonNext.setText(R.string.next_word);
         setRedrawPosition(0);
         recyclerView.post(() -> redrawOne(true));
+        String[] seedWords = getResources().getStringArray(R.array.seed_words);
         inputWord.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         inputWord.addTextChangedListener(new TextWatcher() {
             @Override
@@ -117,18 +119,42 @@ public class SeedValidationFragment extends BaseSeedFragment {
             public void afterTextChanged(Editable editable) {
                 if (editable.toString().length() == 0) {
                     inputWord.setGravity(Gravity.LEFT);
+                    buttonNext.setText(R.string.next_word);
+                    return;
                 } else if (editable.toString().length() == 1) {
                     inputWord.setGravity(Gravity.CENTER_HORIZONTAL);
                 }
+                if (editable.length() > 0) {
+                    ArrayList<String> suggestions = new ArrayList<>();
+                    boolean isFullCoincidence = false;
+                    for (String s : seedWords) {
+                        if (s.startsWith(editable.toString())) {
+                            suggestions.add(s);
+                            if (s.equals(editable.toString())) {
+                                isFullCoincidence = true;
+                            }
+                        }
+                    }
+                    if (suggestions.size() == 1) {
+                        buttonNext.setText(suggestions.get(0));
+                    }
+                    else if (suggestions.size() > 1) {
+                        buttonNext.setText(editable);
+                        if (isFullCoincidence) {
+                            buttonNext.append(" or " + editable);
+                        }
+                        buttonNext.append("...");
+                    }
+                    else {
+                        inputWord.setText(editable.subSequence(0, editable.length() - 1));
+                        inputWord.setSelection(inputWord.getText().toString().length());
+                    }
+                }
+                else {
+                    buttonNext.setText(R.string.next_word);
+                }
             }
         });
-        String[] seedWords = getResources().getStringArray(R.array.seed_words);
-        ArrayAdapter<String> autocompleteAdapter = new ArrayAdapter<>(
-                getContext(),
-                R.layout.view_dropdown_item,
-                seedWords
-        );
-        inputWord.setAdapter(autocompleteAdapter);
     }
 
     private void refreshCounter() {
@@ -151,15 +177,22 @@ public class SeedValidationFragment extends BaseSeedFragment {
     }
 
     private void proceedNext() {
-        if (inputWord.getText().toString().equals("") || inputWord.getText().toString().length() < 3) {
+        if (/*(inputWord.getText().toString().equals("") || inputWord.getText().toString().length() < 3) &&*/
+                (buttonNext.getText().toString().equals(getResources().getString(R.string.next_word)) ||
+                buttonNext.getText().toString().contains("...")) && !buttonNext.getText().toString().contains(" or ")) {
             return;
         }
-        phrase.append(inputWord.getText().toString());
+//        phrase.append(inputWord.getText().toString());
+        if (buttonNext.getText().toString().contains(" or ")) {
+            phrase.append(buttonNext.getText().toString().split(" ")[0]);
+        }
+        else {
+            phrase.append(buttonNext.getText());
+        }
         if (count == maxCount) {
             inputWord.animate().alpha(0).setDuration(BrickView.ANIMATION_DURATION / 2).start();
-        } else {
-            inputWord.setText("");
         }
+        inputWord.setText("");
         redrawOne(false);
         buttonNext.setEnabled(false);
         if (count == maxCount) {

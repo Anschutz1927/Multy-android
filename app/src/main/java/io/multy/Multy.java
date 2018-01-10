@@ -23,6 +23,8 @@ public class Multy extends Application {
         Branch.getAutoInstance(this);
         Timber.plant(new Timber.DebugTree());
 
+        context = getApplicationContext();
+
         new Prefs.Builder()
                 .setContext(this)
                 .setMode(ContextWrapper.MODE_PRIVATE)
@@ -33,15 +35,12 @@ public class Multy extends Application {
                 .setDefaultStringValue("")
                 .build();
 
+        Realm.init(this);
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .encryptionKey(MasterKeyGenerator.generateKey(context))
                 .schemaVersion(1)
                 .migration(new MyRealmMigration())
                 .build());
-
-        context = getApplicationContext();
-
-
     }
 
     public static Context getContext() {
