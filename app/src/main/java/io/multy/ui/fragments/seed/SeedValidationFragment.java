@@ -141,9 +141,9 @@ public class SeedValidationFragment extends BaseSeedFragment {
                     else if (suggestions.size() > 1) {
                         buttonNext.setText(editable);
                         if (isFullCoincidence) {
-                            buttonNext.append(" or " + editable);
+                            buttonNext.append(getString(R.string._or_) + editable);
                         }
-                        buttonNext.append("...");
+                        buttonNext.append(getString(R.string.tree_dots));
                     }
                     else {
                         inputWord.setText(editable.subSequence(0, editable.length() - 1));
@@ -177,13 +177,12 @@ public class SeedValidationFragment extends BaseSeedFragment {
     }
 
     private void proceedNext() {
-        if (/*(inputWord.getText().toString().equals("") || inputWord.getText().toString().length() < 3) &&*/
-                (buttonNext.getText().toString().equals(getResources().getString(R.string.next_word)) ||
-                buttonNext.getText().toString().contains("...")) && !buttonNext.getText().toString().contains(" or ")) {
+        if ((buttonNext.getText().toString().equals(getString(R.string.next_word)) ||
+                buttonNext.getText().toString().contains(getString(R.string.tree_dots))) &&
+                !buttonNext.getText().toString().contains(getString(R.string._or_))) {
             return;
         }
-//        phrase.append(inputWord.getText().toString());
-        if (buttonNext.getText().toString().contains(" or ")) {
+        if (buttonNext.getText().toString().contains(getString(R.string._or_))) {
             phrase.append(buttonNext.getText().toString().split(" ")[0]);
         }
         else {
