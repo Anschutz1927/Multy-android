@@ -28,6 +28,7 @@ import com.samwolfand.oneprefs.Prefs;
 
 import java.util.ArrayList;
 
+import butterknife.BindArray;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -55,11 +56,16 @@ public class SeedValidationFragment extends BaseSeedFragment {
     @BindView(R.id.text_title)
     TextView textViewTitle;
 
+    @BindArray(R.array.seed_words)
+    String[] seedWords;
+
     private SeedViewModel seedModel;
     private StringBuilder phrase = new StringBuilder();
     private int count = 1;
     private int maxCount = 0;
     private Handler handler = new Handler();
+    private boolean isProceedRunning = false;
+    private String currentSeedWord;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -104,7 +110,6 @@ public class SeedValidationFragment extends BaseSeedFragment {
         buttonNext.setText(R.string.next_word);
         setRedrawPosition(0);
         recyclerView.post(() -> redrawOne(true));
-        String[] seedWords = getResources().getStringArray(R.array.seed_words);
         inputWord.setImeOptions(EditorInfo.IME_ACTION_NEXT);
         inputWord.addTextChangedListener(new TextWatcher() {
             @Override
@@ -135,22 +140,22 @@ public class SeedValidationFragment extends BaseSeedFragment {
                             }
                         }
                     }
+                    currentSeedWord = null;
                     if (suggestions.size() == 1) {
                         buttonNext.setText(suggestions.get(0));
-                    }
-                    else if (suggestions.size() > 1) {
+                        currentSeedWord = suggestions.get(0);
+                    } else if (suggestions.size() > 1) {
                         buttonNext.setText(editable);
                         if (isFullCoincidence) {
                             buttonNext.append(getString(R.string._or_) + editable);
+                            currentSeedWord = inputWord.getText().toString();
                         }
                         buttonNext.append(getString(R.string.tree_dots));
-                    }
-                    else {
+                    } else {
                         inputWord.setText(editable.subSequence(0, editable.length() - 1));
                         inputWord.setSelection(inputWord.getText().toString().length());
                     }
-                }
-                else {
+                } else {
                     buttonNext.setText(R.string.next_word);
                 }
             }
@@ -177,42 +182,41 @@ public class SeedValidationFragment extends BaseSeedFragment {
     }
 
     private void proceedNext() {
-        if ((buttonNext.getText().toString().equals(getString(R.string.next_word)) ||
-                buttonNext.getText().toString().contains(getString(R.string.tree_dots))) &&
-                !buttonNext.getText().toString().contains(getString(R.string._or_))) {
+        if (isProceedRunning || currentSeedWord == null || currentSeedWord.isEmpty()) {
             return;
         }
-        if (buttonNext.getText().toString().contains(getString(R.string._or_))) {
-            phrase.append(buttonNext.getText().toString().split(" ")[0]);
-        }
-        else {
-            phrase.append(buttonNext.getText());
-        }
-        if (count == maxCount) {
-            inputWord.animate().alpha(0).setDuration(BrickView.ANIMATION_DURATION / 2).start();
-        }
-        inputWord.setText("");
-        redrawOne(false);
-        buttonNext.setEnabled(false);
-        if (count == maxCount) {
-            if (getActivity().getIntent().hasCategory(Constants.EXTRA_RESTORE)) {
-                seedModel.restore(phrase.toString(), getActivity(), () -> {
-                    hideKeyboard(getActivity());
-                    SeedValidationFragment.this.showNext(new SeedResultFragment());
-                });
-            } else {
-                boolean result = phrase.toString().equals(TextUtils.join(" ", seedModel.phrase.getValue()).replace("\n", " "));
-                Prefs.putBoolean(Constants.PREF_BACKUP_SEED, result);
-                seedModel.failed.setValue(!result);
-                showNext(new SeedResultFragment());
+        isProceedRunning = true;
+        phrase.append(currentSeedWord);
+        inputWord.setText(currentSeedWord);
+        inputWord.setSelection(inputWord.getText().toString().length());
+        handler.postDelayed(() -> {
+            if (count == maxCount) {
+                inputWord.animate().alpha(0).setDuration(BrickView.ANIMATION_DURATION / 2).start();
             }
-        } else {
-            redrawOne(true);
-            phrase.append(" ");
-            count++;
-            refreshCounter();
-        }
-        handler.postDelayed(() -> buttonNext.setEnabled(true), BrickView.ANIMATION_DURATION);
+            inputWord.setText("");
+            redrawOne(false);
+            buttonNext.setEnabled(false);
+            if (count == maxCount) {
+                if (getActivity().getIntent().hasCategory(Constants.EXTRA_RESTORE)) {
+                    seedModel.restore(phrase.toString(), getActivity(), () -> {
+                        hideKeyboard(getActivity());
+                        SeedValidationFragment.this.showNext(new SeedResultFragment());
+                    });
+                } else {
+                    boolean result = phrase.toString().equals(TextUtils.join(" ", seedModel.phrase.getValue()).replace("\n", " "));
+                    Prefs.putBoolean(Constants.PREF_BACKUP_SEED, result);
+                    seedModel.failed.setValue(!result);
+                    showNext(new SeedResultFragment());
+                }
+            } else {
+                redrawOne(true);
+                phrase.append(" ");
+                count++;
+                refreshCounter();
+            }
+            isProceedRunning = false;
+            handler.postDelayed(() -> buttonNext.setEnabled(true), BrickView.ANIMATION_DURATION);
+        }, 500);
     }
 
 }
