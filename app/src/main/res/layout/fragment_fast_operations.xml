@@ -9,6 +9,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:elevation="10dp"
     android:clickable="true"
     android:focusable="true">
 
@@ -130,7 +131,6 @@
             android:layout_marginBottom="8dp"
             android:clickable="true"
             android:focusable="true"
-            android:foreground="?attr/selectableItemBackground"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="27dp"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -139,8 +139,8 @@
 
             <ImageView
                 android:layout_width="match_parent"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
                 android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
                 android:padding="20dp"
                 android:src="@drawable/ic_cancel_blue" />
         </android.support.v7.widget.CardView>
