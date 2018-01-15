@@ -14,12 +14,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -55,12 +57,16 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
     @BindView(R.id.fast_operations)
     View buttonOperations;
 
+    @BindView(R.id.splash)
+    View splash;
+
     private int lastTabPosition = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         ButterKnife.bind(this);
         setupFooter();
         onTabSelected(tabLayout.getTabAt(0));
@@ -81,6 +87,7 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
     @Override
     protected void onResume() {
         super.onResume();
+        overridePendingTransition(0, 0);
         initBranchIO();
 
         if (Prefs.getBoolean(Constants.PREF_APP_INITIALIZED)) {
@@ -92,6 +99,9 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
             tabLayout.getLayoutParams().height = 0;
             buttonOperations.setVisibility(View.GONE);
         }
+
+        new Handler(getMainLooper()).postDelayed(() -> splash.animate().alpha(0).scaleY(4)
+                .scaleX(4).setDuration(500).start(), 500);
     }
 
     private void initBranchIO() {
