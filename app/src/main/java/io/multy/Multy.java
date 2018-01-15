@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.ContextWrapper;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
@@ -17,12 +16,10 @@ import com.tozny.crypto.android.AesCbcWithIntegrity;
 import net.khirr.library.foreground.Foreground;
 
 import java.security.GeneralSecurityException;
-import java.security.NoSuchAlgorithmException;
 
 import io.branch.referral.Branch;
 import io.multy.storage.RealmManager;
 import io.multy.storage.SecurePreferencesHelper;
-import io.multy.ui.activities.SplashActivity;
 import io.multy.util.Constants;
 import io.multy.util.EntropyProvider;
 import io.realm.Realm;
@@ -51,15 +48,15 @@ public class Multy extends Application {
 
         context = getApplicationContext();
 
-        if (Prefs.getString(Constants.PREF_IV, "").equals("")) {
-            try {
-                byte[] iv = AesCbcWithIntegrity.generateIv();
-                String vector = new String(Base64.encode(iv, Base64.NO_WRAP));
-                Prefs.putString(Constants.PREF_IV, vector);
-            } catch (GeneralSecurityException e) {
-                e.printStackTrace();
-            }
-        }
+//        if (Prefs.getString(Constants.PREF_IV, "").equals("")) {
+//            try {
+//                byte[] iv = AesCbcWithIntegrity.generateIv();
+//                String vector = new String(Base64.encode(iv, Base64.NO_WRAP));
+//                Prefs.putString(Constants.PREF_IV, vector);
+//            } catch (GeneralSecurityException e) {
+//                e.printStackTrace();
+//            }
+//        }
 
         if (Prefs.contains(Constants.PREF_VERSION)) {
             PackageInfo pInfo = null;
@@ -72,10 +69,10 @@ public class Multy extends Application {
             }
         }
 
-        final String counter = SecurePreferencesHelper.getString(this, Constants.PIN_COUNTER);
-        if (counter.equals("")) {
-            SecurePreferencesHelper.putString(this, Constants.PIN_COUNTER, String.valueOf(6));
-        }
+//        final String counter = SecurePreferencesHelper.getString(this, Constants.PIN_COUNTER);
+//        if (counter.equals("")) {
+//            SecurePreferencesHelper.putString(this, Constants.PIN_COUNTER, String.valueOf(6));
+//        }
 
         Foreground.Companion.init(this);
     }
@@ -89,13 +86,16 @@ public class Multy extends Application {
      * Generates unique new key for our DATABASE and writes it to our secure encrypted preferences
      * only after generating key we can access the DB
      */
-    public static void makeInitialized() {
+    public static void makeInitialized(Activity activity) {
         Prefs.putBoolean(Constants.PREF_APP_INITIALIZED, true);
         try {
+            byte[] iv = AesCbcWithIntegrity.generateIv();
+            String vector = new String(Base64.encode(iv, Base64.NO_WRAP));
+            Prefs.putString(Constants.PREF_IV, vector);
             String key = new String(Base64.encode(EntropyProvider.generateKey(512), Base64.NO_WRAP));
-            SecurePreferencesHelper.putString(getContext(), Constants.PREF_KEY, key);
+            SecurePreferencesHelper.putString(activity, Constants.PREF_KEY, key);
             RealmManager.open(getContext());
-        } catch (NoSuchAlgorithmException e) {
+        } catch (GeneralSecurityException e) {
             e.printStackTrace();
         }
     }
@@ -104,15 +104,15 @@ public class Multy extends Application {
         try {
             RealmManager.removeDatabase(activity);
             Prefs.clear();
-            Multy.makeInitialized();
+            Multy.makeInitialized(activity);
             Realm.init(activity);
         } catch (Exception exc) {
 //            System.exit(0);
             exc.printStackTrace();
         }
 
-        activity.startActivity(new Intent(activity, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
-        activity.finish();
+//        activity.startActivity(new Intent(activity, SplashActivity.class).setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY));
+//        activity.finish();
     }
 
     public static boolean isConnected(Context context) {

@@ -6,8 +6,8 @@
 
 package io.multy.viewmodels;
 
+import android.app.Activity;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -62,10 +62,10 @@ public class SeedViewModel extends BaseViewModel {
         }
     }
 
-    public void restore(String phrase, Context context, Runnable callback) {
+    public void restore(String phrase, Activity activity, Runnable callback) {
         try {
             isLoading.setValue(true);
-            Multy.makeInitialized();
+            Multy.makeInitialized(activity);
             FirstLaunchHelper.setCredentials(phrase);
             MultyApi.INSTANCE.restore().enqueue(new Callback<WalletsResponse>() {
                 @Override
@@ -98,7 +98,7 @@ public class SeedViewModel extends BaseViewModel {
             isLoading.setValue(false);
             failed.setValue(true);
             callback.run();
-            Toast.makeText(context, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

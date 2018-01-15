@@ -128,7 +128,7 @@ public class SeedValidationFragment extends BaseSeedFragment {
                     inputWord.setGravity(Gravity.LEFT);
                     buttonNext.setText(R.string.next_word);
                     return;
-                } else if (editable.toString().length() == 1) {
+                } else {
                     inputWord.setGravity(Gravity.CENTER_HORIZONTAL);
                 }
                 if (editable.length() > 0) {
