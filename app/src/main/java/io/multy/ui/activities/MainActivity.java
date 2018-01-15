@@ -101,7 +101,7 @@ public class MainActivity extends BaseActivity implements TabLayout.OnTabSelecte
         }
 
         new Handler(getMainLooper()).postDelayed(() -> splash.animate().alpha(0).scaleY(4)
-                .scaleX(4).setDuration(500).start(), 500);
+                .scaleX(4).setDuration(400).start(), 300);
     }
 
     private void initBranchIO() {

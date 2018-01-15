@@ -42,15 +42,15 @@ public class SplashActivity extends AppCompatActivity {
 //        FirstLaunchHelper.preventRootIfDetected(this);
 
         Animation emergency = AnimationUtils.loadAnimation(this, R.anim.splash_emergency);
-        emergency.setDuration(500);
+        emergency.setDuration(350);
         emergency.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
+                getServerConfig();
             }
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                getServerConfig();
             }
 
             @Override
