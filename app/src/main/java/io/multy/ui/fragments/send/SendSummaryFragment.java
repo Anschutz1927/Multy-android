@@ -11,14 +11,16 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import butterknife.BindString;
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+import butterknife.OnTouch;
 import io.multy.R;
 import io.multy.api.MultyApi;
 import io.multy.api.socket.CurrenciesRate;
@@ -64,6 +66,10 @@ public class SendSummaryFragment extends BaseFragment {
     TextView textFeeSpeedLabel;
     @BindView(R.id.button_next)
     View buttonNext;
+    @BindView(R.id.image_slider)
+    View slider;
+    @BindView(R.id.scrollview)
+    ScrollView scrollView;
 
     @BindString(R.string.donation_format_pattern)
     String formatPattern;
@@ -201,6 +207,21 @@ public class SendSummaryFragment extends BaseFragment {
         viewModel.errorMessage.postValue(getString(R.string.error_sending_tx));
     }
 
+    private void moveSliderToNextPoint(float rawX) {
+        rawX -= slider.getWidth() / 2;
+        slider.setTranslationX(rawX);
+        if (slider.getX() + slider.getWidth() > buttonNext.getX() + buttonNext.getWidth()) {
+            if (getActivity() instanceof BaseActivity) {
+                ((BaseActivity) getActivity()).showLock();
+                ((BaseActivity) getActivity()).setOnLockCLoseListener(this::send);
+            }
+        }
+    }
+
+    private void returnSliderOnStart() {
+        slider.setTranslationX(0f);
+    }
+
     public static String byteArrayToHex(byte[] a) {
         StringBuilder sb = new StringBuilder(a.length * 2);
         for (byte b : a)
@@ -208,11 +229,20 @@ public class SendSummaryFragment extends BaseFragment {
         return sb.toString();
     }
 
-    @OnClick(R.id.button_next)
-    void onClickNext() {
-        if (getActivity() instanceof BaseActivity) {
-            ((BaseActivity) getActivity()).showLock();
-            ((BaseActivity) getActivity()).setOnLockCLoseListener(this::send);
+    @OnTouch(R.id.image_slider)
+    boolean OnSliderTouch(View v, MotionEvent ev) {
+        scrollView.requestDisallowInterceptTouchEvent(true);
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                moveSliderToNextPoint(ev.getRawX());
+                return true;
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                returnSliderOnStart();
+                return true;
+                default: return false;
         }
     }
 }
