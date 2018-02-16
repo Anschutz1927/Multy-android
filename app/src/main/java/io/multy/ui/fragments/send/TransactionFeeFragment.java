@@ -7,7 +7,6 @@
 package io.multy.ui.fragments.send;
 
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.constraint.Group;
@@ -80,9 +79,7 @@ public class TransactionFeeFragment extends BaseFragment implements MyFeeAdapter
         viewModel = ViewModelProviders.of(getActivity()).get(AssetSendViewModel.class);
         setBaseViewModel(viewModel);
         inputDonation.setOnFocusChangeListener((view1, hasFocus) -> {
-            if (hasFocus) {
-                scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 500);
-            } else {
+            if (!hasFocus) {
                 if (!TextUtils.isEmpty(inputDonation.getText())
                         && !inputDonation.getText().toString().equals(getString(R.string.donation_default))) {
                     Analytics.getInstance(getActivity()).logTransactionFee(AnalyticsConstants.TRANSACTION_FEE_DONATION_CHANGED, viewModel.getChainId());
@@ -107,33 +104,6 @@ public class TransactionFeeFragment extends BaseFragment implements MyFeeAdapter
     public void onDestroyView() {
         hideKeyboard(getActivity());
         super.onDestroyView();
-    }
-
-    @OnClick(R.id.button_next)
-    void onClickNext() {
-        Fee selectedFee = ((MyFeeAdapter) recyclerView.getAdapter()).getSelectedFee();
-
-        if (selectedFee != null) {
-            viewModel.setFee(selectedFee);
-
-            if (switcher.isChecked()) {
-                viewModel.setDonationAmount(inputDonation.getText().toString());
-            } else {
-                viewModel.setDonationAmount(null);
-            }
-
-            ((AssetSendActivity) getActivity()).setFragment(R.string.send_amount, R.id.container, AmountChooserFragment.newInstance());
-
-            if (viewModel.isAmountScanned()) {
-                ((AssetSendActivity) getActivity()).setFragment(R.string.send_summary, R.id.container, SendSummaryFragment.newInstance());
-            }
-        } else {
-            Toast.makeText(getActivity(), R.string.choose_transaction_speed, Toast.LENGTH_SHORT).show();
-        }
-
-        if (!isDonationChanged) {
-            Analytics.getInstance(getActivity()).logTransactionFee(AnalyticsConstants.TRANSACTION_FEE_DONATION, viewModel.getChainId());
-        }
     }
 
     private void setupSwitcher() {
@@ -259,6 +229,10 @@ public class TransactionFeeFragment extends BaseFragment implements MyFeeAdapter
             }
         } else {
             Toast.makeText(getActivity(), R.string.choose_transaction_speed, Toast.LENGTH_SHORT).show();
+        }
+
+        if (!isDonationChanged) {
+            Analytics.getInstance(getActivity()).logTransactionFee(AnalyticsConstants.TRANSACTION_FEE_DONATION, viewModel.getChainId());
         }
     }
 }
