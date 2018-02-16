@@ -233,4 +233,32 @@ public class TransactionFeeFragment extends BaseFragment implements MyFeeAdapter
                 break;
         }
     }
+
+    @OnClick(R.id.input_donation)
+    void onDonationClick() {
+        scrollView.postDelayed(() -> scrollView.fullScroll(ScrollView.FOCUS_DOWN), 500);
+    }
+
+    @OnClick(R.id.button_next)
+    void onClickNext() {
+        Fee selectedFee = ((MyFeeAdapter) recyclerView.getAdapter()).getSelectedFee();
+
+        if (selectedFee != null) {
+            viewModel.setFee(selectedFee);
+
+            if (switcher.isChecked()) {
+                viewModel.setDonationAmount(inputDonation.getText().toString());
+            } else {
+                viewModel.setDonationAmount(null);
+            }
+
+            ((AssetSendActivity) getActivity()).setFragment(R.string.send_amount, R.id.container, AmountChooserFragment.newInstance());
+
+            if (viewModel.isAmountScanned()) {
+                ((AssetSendActivity) getActivity()).setFragment(R.string.send_summary, R.id.container, SendSummaryFragment.newInstance());
+            }
+        } else {
+            Toast.makeText(getActivity(), R.string.choose_transaction_speed, Toast.LENGTH_SHORT).show();
+        }
+    }
 }
