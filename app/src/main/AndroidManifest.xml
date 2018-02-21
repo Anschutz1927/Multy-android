@@ -77,6 +77,7 @@
             android:name=".ui.activities.AssetSendActivity"
             android:label="@string/send_to"
             android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateHidden|adjustUnspecified"
             android:theme="@style/Send" />
         <activity
             android:name=".ui.activities.ExchangingActivity"
