@@ -31,7 +31,7 @@ public class ChainAdapter extends RecyclerView.Adapter<ChainAdapter.Holder> {
     private TypedArray availableChainsImageIds;
     private String[] availableChainsAbbrev;
     private String[] availableChainsName;
-    private TypedArray disabbledChainsImageIds;
+    private TypedArray disabledChainsImageIds;
     private String[] disabledChainsAbbrev;
     private String[] disabledChainsName;
 
@@ -65,7 +65,7 @@ public class ChainAdapter extends RecyclerView.Adapter<ChainAdapter.Holder> {
                 holder.itemView.setOnClickListener(v -> listener.onClickAvailableChain(availableChainsAbbrev[position]));
                 break;
             case SOON:
-                ((DisabledChainHolder) holder).imageCoin.setImageDrawable(disabbledChainsImageIds.getDrawable(position));
+                ((DisabledChainHolder) holder).imageCoin.setImageDrawable(disabledChainsImageIds.getDrawable(position));
                 ((DisabledChainHolder) holder).textChainAbbrev.setText(disabledChainsAbbrev[position]);
                 ((DisabledChainHolder) holder).textChainName.setText(disabledChainsName[position]);
                 holder.divider.setVisibility(position == disabledChainsAbbrev.length - 1 ? View.INVISIBLE : View.VISIBLE);
@@ -94,7 +94,7 @@ public class ChainAdapter extends RecyclerView.Adapter<ChainAdapter.Holder> {
     }
 
     public void setSoonChainsData(TypedArray chainsSoonImageIds, String[] chainsSoonAbbrev, String[] chainsSoonName) {
-        this.disabbledChainsImageIds = chainsSoonImageIds;
+        this.disabledChainsImageIds = chainsSoonImageIds;
         this.disabledChainsAbbrev = chainsSoonAbbrev;
         this.disabledChainsName = chainsSoonName;
         notifyDataSetChanged();

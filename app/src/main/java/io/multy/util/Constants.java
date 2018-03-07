@@ -17,6 +17,8 @@ public class Constants {
 
     public static final String DONTAION_ADDRESS = "mzqiDnETWkunRDZxjUQ34JzN1LDevh5DpU";
 
+    public static final int ANDROID_OS_ID = 1;
+
     public static final int POSITION_ASSETS = 0;
     public static final int POSITION_FEED = 1;
     public static final int POSITION_CONTACTS = 3;

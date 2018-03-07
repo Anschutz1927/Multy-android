@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.samwolfand.oneprefs.Prefs;
 
 import butterknife.BindView;
@@ -28,14 +27,11 @@ import io.branch.referral.Branch;
 import io.multy.BuildConfig;
 import io.multy.R;
 import io.multy.api.MultyApi;
-import io.multy.api.socket.SocketManager;
 import io.multy.model.responses.ServerConfigResponse;
 import io.multy.storage.RealmManager;
 import io.multy.ui.fragments.dialogs.SimpleDialogFragment;
 import io.multy.util.Constants;
 import io.multy.util.FirstLaunchHelper;
-import io.multy.util.NativeDataHelper;
-import io.multy.util.SingleLiveEvent;
 import io.multy.util.analytics.Analytics;
 import io.multy.util.analytics.AnalyticsConstants;
 import io.realm.Realm;
@@ -107,9 +103,8 @@ public class SplashActivity extends AppCompatActivity {
                             showMainActivity();
                         }
 
-                        if (configResponse.getDonateInfo() != null) {
-                            Prefs.putString(Constants.PREF_DONATE_ADDRESS_BTC, configResponse.getDonateInfo().getBtcDonateAddress());
-                            Prefs.putString(Constants.PREF_DONATE_ADDRESS_ETH, configResponse.getDonateInfo().getEthDonateAddress());
+                        if (configResponse.getDonate() != null) {
+                            //todo save donate info
                         }
                     } catch (PackageManager.NameNotFoundException e) {
                         e.printStackTrace();

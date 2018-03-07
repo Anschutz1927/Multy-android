@@ -8,9 +8,12 @@ package io.multy.storage;
 
 import java.util.List;
 
+import io.multy.model.entities.DonateInfoEntity;
 import io.multy.model.entities.wallet.RecentAddress;
 import io.multy.model.entities.wallet.WalletAddress;
 import io.multy.model.entities.wallet.WalletRealmObject;
+import io.multy.model.responses.ServerConfigResponse;
+import io.multy.util.Constants;
 import io.reactivex.annotations.NonNull;
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -104,5 +107,18 @@ public class AssetsDao {
 
     public RealmResults<RecentAddress> getRecentAddresses() {
         return realm.where(RecentAddress.class).findAll();
+    }
+
+    public void saveDonation(List<ServerConfigResponse.Donate> donates) {
+        realm.executeTransactionAsync(realm -> {
+            for (ServerConfigResponse.Donate donate : donates) {
+                if (donate.getOs() == Constants.ANDROID_OS_ID) {
+                    DonateInfoEntity donateInfo = new DonateInfoEntity(donate.getFeatureCode());
+                    donateInfo.setDonationAddress(donate.getDonationAddress());
+                    donateInfo.setFeatureDescription(donate.getFeatureDescription());
+                    realm.insertOrUpdate(donateInfo);
+                }
+            }
+        }, Throwable::printStackTrace);
     }
 }
