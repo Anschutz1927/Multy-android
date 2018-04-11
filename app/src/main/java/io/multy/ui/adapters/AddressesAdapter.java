@@ -41,11 +41,6 @@ public class AddressesAdapter extends RecyclerView.Adapter<AddressesAdapter.Hold
         return new AddressesAdapter.Holder(view);
     }
 
-    public void addItem(WalletAddress walletAddress) {
-        addresses.add(walletAddress);
-        notifyItemInserted(addresses.size() - 1);
-    }
-
     @Override
     public void onBindViewHolder(AddressesAdapter.Holder holder, int position) {
         holder.bind(addresses.get(position));
