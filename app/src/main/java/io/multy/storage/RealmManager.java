@@ -42,25 +42,27 @@ public class RealmManager {
     }
 
     public static AssetsDao getAssetsDao() {
-        isRealmAvailable();
-        return new AssetsDao(realm);
+//        isRealmAvailable();
+        return new AssetsDao(isRealmNeedOpen() ? open() : realm);
     }
 
     public static SettingsDao getSettingsDao() {
-        isRealmAvailable();
-        return new SettingsDao(realm);
+//        isRealmAvailable();
+        return new SettingsDao(isRealmNeedOpen() ? open() : realm);
     }
 
     public static void clear() {
-        if (realm == null || realm.isClosed()) {
-            open();
-        }
+//        if (realm == null || realm.isClosed()) {
+//            open();
+//        }
+//
+//        if (realm != null) {
+//            realm.executeTransaction(realm -> realm.deleteAll());
+//        }
+    }
 
-        if (realm != null) {
-            realm.executeTransaction(realm -> realm.deleteAll());
-        }
-
-        close();
+    public static boolean isRealmNeedOpen() {
+        return realm == null || realm.isClosed();
     }
 
     private static void isRealmAvailable() {
@@ -74,20 +76,11 @@ public class RealmManager {
         }
     }
 
-//    public static void deleteRealm() {
-//        if (realm == null) {
-//            open(Multy.getContext());
-//        }
-//
-//        if (!realm.isClosed()){
-//            realm.close();
-//        }
-//
-//        Realm.deleteRealm()
-//    }
-
     public static void removeDatabase(Context context) {
         for (File file : context.getFilesDir().listFiles()) {
+            if (file.isHidden()) {
+                continue;
+            }
             if (file.getAbsolutePath().contains("realm")) {
                 if (file.isDirectory()) {
                     removeFilesFromDirectory(file);
@@ -99,6 +92,9 @@ public class RealmManager {
 
     private static void removeFilesFromDirectory(File file) {
         for (File subFile : file.listFiles()) {
+            if (file.isHidden()) {
+                continue;
+            }
             if (subFile.isDirectory()) {
                 removeFilesFromDirectory(file);
             }

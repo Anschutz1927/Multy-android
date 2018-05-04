@@ -75,7 +75,7 @@ public class BaseActivity extends AppCompatActivity implements PinNumbersAdapter
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         if (Prefs.getBoolean(Constants.PREF_APP_INITIALIZED)) {
             if (!isLockVisible) {
-                if (RealmManager.open() == null) {
+                if (RealmManager.isRealmNeedOpen() && RealmManager.open() == null) { //closed&&if needed
                     finish();
                     Intent splashIntent = new Intent(this, SplashActivity.class);
                     splashIntent.putExtra(SplashActivity.RESET_FLAG, true);
@@ -105,7 +105,7 @@ public class BaseActivity extends AppCompatActivity implements PinNumbersAdapter
             @Override
             public void foreground() {
                 if (Prefs.getBoolean(Constants.PREF_APP_INITIALIZED) && !Prefs.getBoolean(Constants.PREF_LOCK)) {
-                    if (RealmManager.open() == null) {
+                    if (RealmManager.isRealmNeedOpen() && RealmManager.open() == null) {//closed&&needed
                         finish();
                         Intent splashIntent = new Intent(BaseActivity.this, SplashActivity.class);
                         splashIntent.putExtra(SplashActivity.RESET_FLAG, true);
@@ -132,6 +132,12 @@ public class BaseActivity extends AppCompatActivity implements PinNumbersAdapter
     @Override
     protected void onDestroy() {
         Foreground.Companion.removeListener(foregroundListener);
+        try {
+            RealmManager.close();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
         super.onDestroy();
     }
 
@@ -221,7 +227,7 @@ public class BaseActivity extends AppCompatActivity implements PinNumbersAdapter
             isLockVisible = false;
         }
 
-        if (RealmManager.open() == null) {
+        if (RealmManager.isRealmNeedOpen() && RealmManager.open() == null) {//closed&&needed
             finish();
             Intent splashIntent = new Intent(this, SplashActivity.class);
             splashIntent.putExtra(SplashActivity.RESET_FLAG, true);

@@ -201,7 +201,9 @@ public class CreateAssetFragment extends BaseFragment {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 walletViewModel.isLoading.setValue(false);
                 if (response.isSuccessful()) {
-                    RealmManager.open();
+                    if (RealmManager.isRealmNeedOpen()) {
+                        RealmManager.open();//if needed
+                    }
                     RealmManager.getAssetsDao().saveWallet(walletRealmObject);
                     showWalletInfoActivity(walletRealmObject);
                 } else {

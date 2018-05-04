@@ -121,7 +121,11 @@ public class WalletViewModel extends BaseViewModel {
                     return null;
                 }
 
-                RealmManager.open();
+//                RealmManager.open();
+                Multy.makeInitialized();
+                if (RealmManager.isRealmNeedOpen()) {
+                    RealmManager.open();//if needed
+                }
                 FirstLaunchHelper.setCredentials("");
                 saveDonateAddresses();
             }
