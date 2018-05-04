@@ -7,11 +7,14 @@
 package io.multy.ui.activities;
 
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -38,7 +41,6 @@ import io.multy.util.Constants;
 import io.multy.util.FirstLaunchHelper;
 import io.multy.util.analytics.Analytics;
 import io.multy.util.analytics.AnalyticsConstants;
-import io.realm.Realm;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -58,10 +60,15 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
+        if (getIntent().getBooleanExtra(RESET_FLAG, false)) {
+            clearApp();
+            return;
+        }
+
         if (FirstLaunchHelper.preventRootIfDetected(this) && !BuildConfig.DEBUG) {
             try {
                 Prefs.clear();
-                RealmManager.clear();
+//                RealmManager.clear();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -162,7 +169,6 @@ public class SplashActivity extends AppCompatActivity {
                 try {
                     RealmManager.removeDatabase(this);
                     Prefs.clear();
-                    Realm.init(getApplicationContext());
                 } catch (Exception exc) {
                     exc.printStackTrace();
                 }
@@ -249,5 +255,19 @@ public class SplashActivity extends AppCompatActivity {
             Analytics.getInstance(this).logPush(AnalyticsConstants.PUSH_OPEN,
                     getIntent().getStringExtra(getString(R.string.push_id)));
         }
+    }
+
+    private void clearApp() {
+        RealmManager.removeDatabase(getApplicationContext());
+        Prefs.clear();
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (alarmManager == null) {
+            return;
+        }
+        Intent restartIntent = new Intent(this, SplashActivity.class);
+        alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + 300,
+                PendingIntent.getActivity(getApplicationContext(), 560,
+                        restartIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+        new Handler().post(() -> System.exit(0));
     }
 }
